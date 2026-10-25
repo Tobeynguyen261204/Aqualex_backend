@@ -132,4 +132,57 @@ public class Contract {
     public Instant getUpdatedAt() {
         return updatedAt;
     }
+    public void update(
+            String exporterName,
+            String importerName,
+            String productName,
+            BigDecimal quantity,
+            String unit,
+            String currency,
+            BigDecimal unitPrice,
+            String incoterm,
+            String departurePort,
+            String arrivalPort
+    ) {
+        if (exporterName != null) {
+        this.exporterName = exporterName;
+    }
+
+    if (importerName != null) {
+        this.importerName = importerName;
+    }
+
+    if (productName != null) {
+        this.productName = productName;
+    }
+
+    if (quantity != null) {
+        this.quantity = quantity;
+    }
+
+    if (unit != null) {
+        this.unit = unit;
+    }
+
+    if (currency != null) {
+        this.currency = currency;
+    }
+
+    if (unitPrice != null) {
+        this.unitPrice = unitPrice;
+    }
+
+    if (incoterm != null) {
+        this.incoterm = incoterm;
+    }
+
+    if (departurePort != null) {
+        this.departurePort = departurePort;
+    }
+
+    if (arrivalPort != null) {
+        this.arrivalPort = arrivalPort;
+    }
+        this.updatedAt = Instant.now();
+    }
 }

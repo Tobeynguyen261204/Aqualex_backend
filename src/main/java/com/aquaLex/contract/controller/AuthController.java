@@ -1,5 +1,6 @@
 package com.aquaLex.contract.controller;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,10 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpHeaders;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import com.aquaLex.common.exception.InvalidTokenException;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -58,10 +62,16 @@ public ApiResponse<AuthResponse> loginUser(@Valid @RequestBody LoginRequest logi
 }
 @PostMapping("/logout")
 @Operation (summary = "Logout a user", description = "Logs out the currently authenticated user.")
+@SecurityRequirement(name = "bearerAuth")
 @ResponseStatus(HttpStatus.OK)
-public ApiResponse<Void> logoutUser(HttpServletRequest request) {
-       String authorizationHeader =
-            request.getHeader(HttpHeaders.AUTHORIZATION);
+public ApiResponse<Void> logoutUser(
+        @Parameter(hidden = true)
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
+        String authorizationHeader,
+        @Parameter(description = "Raw refresh token returned by login", example = "refresh-token-value")
+        @RequestHeader(value = "Refresh-Token", required = false)
+        String refreshToken,
+        HttpServletRequest request) {
 
     if (authorizationHeader == null
             || !authorizationHeader.startsWith("Bearer ")) {
@@ -71,9 +81,6 @@ public ApiResponse<Void> logoutUser(HttpServletRequest request) {
     }
 
     String accessToken = authorizationHeader.substring(7);
-
-    String refreshToken = request.getHeader("Refresh-Token");
-
     if (refreshToken == null || refreshToken.isBlank()) {
         throw new InvalidTokenException(
                 "Refresh-Token header is missing or empty"
@@ -86,6 +93,57 @@ public ApiResponse<Void> logoutUser(HttpServletRequest request) {
             "USER_LOGGED_OUT",
             "User logged out successfully",
             null,
+            request.getRequestURI()
+    );
+
+}
+@PostMapping("/refresh")
+@Operation (summary = "Refresh access token", description = "Refreshes the access token using a valid refresh token")
+public ApiResponse<AuthResponse> refreshToken(
+        @Parameter(description = "Raw refresh token returned by login", example = "refresh-token-value")
+        @RequestHeader(value = "Refresh-Token", required = false)
+        String refreshToken,
+        HttpServletRequest request) {
+
+    if (refreshToken == null || refreshToken.isBlank()) {
+        throw new InvalidTokenException(
+                "Refresh-Token header is missing or empty"
+        );
+    }
+
+    AuthResponse authResponse = authService.refreshAccessToken(refreshToken);
+
+    return ApiResponse.success(
+            "ACCESS_TOKEN_REFRESHED",
+            "Access token refreshed successfully",
+            authResponse,
+            request.getRequestURI()
+    );
+
+}
+@GetMapping ("/profile")
+@Operation (summary = "Get user profile", description = "Retrieves the profile information of the currently authenticated user.")
+@SecurityRequirement(name = "bearerAuth")
+public ApiResponse<UserResponse> getUserProfile(
+        @Parameter(hidden = true)
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
+        String authorizationHeader,
+        HttpServletRequest request) {
+
+    if (authorizationHeader == null
+            || !authorizationHeader.startsWith("Bearer ")) {
+        throw new InvalidTokenException(
+                "Authorization header is missing or invalid"
+        );
+    }
+
+    String accessToken = authorizationHeader.substring(7);
+    UserResponse userResponse = authService.getUserProfile(accessToken);
+
+    return ApiResponse.success(
+            "USER_PROFILE_RETRIEVED",
+            "User profile retrieved successfully",
+            userResponse,
             request.getRequestURI()
     );
 }

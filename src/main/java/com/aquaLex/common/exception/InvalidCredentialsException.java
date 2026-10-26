@@ -11,4 +11,11 @@ public class InvalidCredentialsException extends BusinessException {
                 HttpStatus.UNAUTHORIZED
         );
     }
+     public InvalidCredentialsException(String message) {
+        super(
+            "INVALID_CREDENTIALS",
+            message,
+            HttpStatus.UNAUTHORIZED
+        );
+    }
 }

@@ -13,6 +13,7 @@ import com.aquaLex.contract.dto.AuthResponse;
 import com.aquaLex.contract.dto.LoginRequest;
 import com.aquaLex.contract.dto.RegisterRequest;
 import com.aquaLex.contract.dto.UserResponse;
+import com.aquaLex.contract.infrastructure.RefreshTokenRepository;
 import com.aquaLex.contract.infrastructure.UserRepository;
 import com.aquaLex.contract.security.JwtService;
 
@@ -25,6 +26,7 @@ public class AuthService {
     private final JwtService jwtService;
 private final TokenBlacklistService tokenBlacklistService;
 private final RefreshTokenService refreshTokenService;
+
     
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, TokenBlacklistService tokenBlacklistService, RefreshTokenService refreshTokenService) {
         this.userRepository = userRepository;
@@ -89,4 +91,46 @@ public void logoutUser(String accessToken, String rawRefreshToken) {
     }
     refreshTokenService.revokeRefreshToken(rawRefreshToken);
 }
+    // public RefreshToken refreshAccessToken(String rawRefreshToken)
+    // {
+    //     String tokenHash = refreshTokenService.hashRefreshToken(rawRefreshToken);
+    //     RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash)
+    //             .orElseThrow(() -> new InvalidCredentialsException("Refresh token not found"));
+
+    //     if (refreshToken == null || refreshToken.getExpiresAt().isBefore(java.time.Instant.now())) {
+    //         throw new InvalidCredentialsException("Refresh token is invalid or expired");
+    //     }
+    //     if (refreshToken.isRevoked()) {
+    //         throw new InvalidCredentialsException("Refresh token has been revoked");
+    //     }
+    //     return refreshToken;
+    // }
+    public AuthResponse refreshAccessToken(String rawRefreshToken){
+        RefreshToken oldRefreshToken = refreshTokenService.validateRefreshToken(rawRefreshToken);
+        User user = oldRefreshToken.getUser();
+        oldRefreshToken.revoke();
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = refreshTokenService.createRefreshToken(user);
+        return new AuthResponse(
+            newAccessToken,
+            newRefreshToken,
+            "Bearer",
+            900 // Access token expiration time in seconds (15 minutes)
+        );
+    }
+    public UserResponse getUserProfile(String accessToken)
+    {
+        String userEmail = jwtService.extractEmail(accessToken);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return new UserResponse(
+            user.getId(),        
+            user.getEmail(),     
+            user.getUserName(),  
+            user.getFullName(),  
+            user.getRole(),      
+            user.getCreatedAt(), 
+            user.getUpdatedAt()  
+        );
+    }
 }

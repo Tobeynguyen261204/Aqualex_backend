@@ -64,4 +64,18 @@ public class RefreshTokenService {
         refreshToken.revoke();
         refreshTokenRepository.save(refreshToken);
     } 
+    @Transactional 
+    public RefreshToken validateRefreshToken(String rawRefreshToken) {
+        String tokenHash = hashRefreshToken(rawRefreshToken);
+        RefreshToken refreshToken = refreshTokenRepository.findByTokenHash(tokenHash)
+                .orElseThrow(() -> new IllegalArgumentException("Refresh token not found"));
+
+        if (refreshToken == null || refreshToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new IllegalArgumentException("Refresh token is invalid or expired");
+        }
+        if (refreshToken.isRevoked()) {
+            throw new IllegalArgumentException("Refresh token has been revoked");
+        }
+        return refreshToken;
+    }
 }

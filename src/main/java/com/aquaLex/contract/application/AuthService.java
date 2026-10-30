@@ -133,4 +133,17 @@ public void logoutUser(String accessToken, String rawRefreshToken) {
             user.getUpdatedAt()  
         );
     }
+    public UserResponse getUserProfileByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return new UserResponse(
+                user.getId(),
+                user.getEmail(),
+                user.getUserName(),
+                user.getFullName(),
+                user.getRole(),
+                user.getCreatedAt(),
+                user.getUpdatedAt()
+        );
+    }
 }

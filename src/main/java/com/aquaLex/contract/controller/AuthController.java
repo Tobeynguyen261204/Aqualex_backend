@@ -14,6 +14,7 @@ import com.aquaLex.contract.dto.RegisterRequest;
 import com.aquaLex.contract.dto.UserResponse;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.HttpHeaders;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,6 +65,7 @@ public ApiResponse<AuthResponse> loginUser(@Valid @RequestBody LoginRequest logi
 @Operation (summary = "Logout a user", description = "Logs out the currently authenticated user.")
 @SecurityRequirement(name = "bearerAuth")
 @ResponseStatus(HttpStatus.OK)
+@SecurityRequirement(name = "bearerAuth")
 public ApiResponse<Void> logoutUser(
         @Parameter(hidden = true)
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
@@ -99,6 +101,7 @@ public ApiResponse<Void> logoutUser(
 }
 @PostMapping("/refresh")
 @Operation (summary = "Refresh access token", description = "Refreshes the access token using a valid refresh token")
+@SecurityRequirement(name = "bearerAuth")
 public ApiResponse<AuthResponse> refreshToken(
         @Parameter(description = "Raw refresh token returned by login", example = "refresh-token-value")
         @RequestHeader(value = "Refresh-Token", required = false)
@@ -127,18 +130,10 @@ public ApiResponse<AuthResponse> refreshToken(
 public ApiResponse<UserResponse> getUserProfile(
         @Parameter(hidden = true)
         @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false)
-        String authorizationHeader,
+        Authentication authentication,
         HttpServletRequest request) {
-
-    if (authorizationHeader == null
-            || !authorizationHeader.startsWith("Bearer ")) {
-        throw new InvalidTokenException(
-                "Authorization header is missing or invalid"
-        );
-    }
-
-    String accessToken = authorizationHeader.substring(7);
-    UserResponse userResponse = authService.getUserProfile(accessToken);
+    String email = authentication.getName();
+    UserResponse userResponse = authService.getUserProfileByEmail(email);
 
     return ApiResponse.success(
             "USER_PROFILE_RETRIEVED",

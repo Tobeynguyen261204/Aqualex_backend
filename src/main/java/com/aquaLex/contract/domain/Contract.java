@@ -10,12 +10,20 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 @Entity
 @Table(name = "contracts")
 public class Contract {
    @Id
    @GeneratedValue(strategy = GenerationType.UUID)
    private UUID id;
+
+   @ManyToOne(fetch = FetchType.LAZY, optional = false)
+   @JoinColumn(name = "user_id", nullable = false)
+   private User user;
+
    @Column(name ="exporter_name",nullable = false)
    private String exporterName;
    @Column (name ="importer_name",nullable = false)
@@ -60,8 +68,10 @@ public class Contract {
             BigDecimal unitPrice,
             String incoterm,
             String departurePort,
-            String arrivalPort
+            String arrivalPort,
+            User user
     ) {
+        this.user = user;
         this.exporterName = exporterName;
         this.importerName = importerName;
         this.productName = productName;
@@ -79,6 +89,10 @@ public class Contract {
 
     public UUID getId() {
         return id;
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public String getExporterName() {

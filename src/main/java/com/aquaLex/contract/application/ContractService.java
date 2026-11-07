@@ -2,12 +2,12 @@ package com.aquaLex.contract.application;
 
 import com.aquaLex.common.exception.ContractNotFoundException;
 import com.aquaLex.contract.domain.Contract;
-import com.aquaLex.contract.domain.User;
+import com.aquaLex.auth.domain.User;
 import com.aquaLex.contract.dto.CreateContractRequest;
 import com.aquaLex.contract.dto.UpdateContractRequest;
 import com.aquaLex.contract.dto.ContractResponse;
 import com.aquaLex.contract.infrastructure.ContractRepository;
-import com.aquaLex.contract.infrastructure.UserRepository;
+import com.aquaLex.auth.infrastructure.UserRepository;
 
 import java.util.List;
 import java.util.UUID;

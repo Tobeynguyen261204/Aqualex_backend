@@ -1,9 +1,9 @@
-package com.aquaLex.contract.dto;
+package com.aquaLex.auth.dto;
 
 import java.time.Instant;
 import java.util.UUID;
 
-import com.aquaLex.contract.domain.UserRole;
+import com.aquaLex.auth.domain.UserRole;
 
 public record UserResponse(    
         UUID id,

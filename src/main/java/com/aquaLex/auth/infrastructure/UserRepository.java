@@ -1,11 +1,11 @@
-package com.aquaLex.contract.infrastructure;
+package com.aquaLex.auth.infrastructure;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.aquaLex.contract.domain.User;
+import com.aquaLex.auth.domain.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);

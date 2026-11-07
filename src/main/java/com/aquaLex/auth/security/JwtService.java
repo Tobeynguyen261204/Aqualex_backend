@@ -1,4 +1,4 @@
-package com.aquaLex.contract.security;
+package com.aquaLex.auth.security;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -7,7 +7,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Service;
 
-import com.aquaLex.contract.domain.User;
+import com.aquaLex.auth.domain.User;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

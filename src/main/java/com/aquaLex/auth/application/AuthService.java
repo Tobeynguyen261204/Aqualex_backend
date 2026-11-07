@@ -1,4 +1,4 @@
-package com.aquaLex.contract.application;
+package com.aquaLex.auth.application;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -6,16 +6,16 @@ import org.springframework.stereotype.Service;
 import com.aquaLex.common.exception.EmailAlreadyExistsException;
 import com.aquaLex.common.exception.InvalidCredentialsException;
 import com.aquaLex.common.exception.UsernameAlreadyExistsException;
-import com.aquaLex.contract.domain.RefreshToken;
-import com.aquaLex.contract.domain.User;
-import com.aquaLex.contract.domain.UserRole;
-import com.aquaLex.contract.dto.AuthResponse;
-import com.aquaLex.contract.dto.LoginRequest;
-import com.aquaLex.contract.dto.RegisterRequest;
-import com.aquaLex.contract.dto.UserResponse;
-import com.aquaLex.contract.infrastructure.RefreshTokenRepository;
-import com.aquaLex.contract.infrastructure.UserRepository;
-import com.aquaLex.contract.security.JwtService;
+import com.aquaLex.auth.domain.RefreshToken;
+import com.aquaLex.auth.domain.User;
+import com.aquaLex.auth.domain.UserRole;
+import com.aquaLex.auth.dto.AuthResponse;
+import com.aquaLex.auth.dto.LoginRequest;
+import com.aquaLex.auth.dto.RegisterRequest;
+import com.aquaLex.auth.dto.UserResponse;
+import com.aquaLex.auth.infrastructure.RefreshTokenRepository;
+import com.aquaLex.auth.infrastructure.UserRepository;
+import com.aquaLex.auth.security.JwtService;
 
 import java.time.Duration;
 

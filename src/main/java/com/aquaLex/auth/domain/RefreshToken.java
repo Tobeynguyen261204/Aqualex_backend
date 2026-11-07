@@ -1,4 +1,4 @@
-package com.aquaLex.contract.domain;
+package com.aquaLex.auth.domain;
 
 import java.time.Instant;
 import java.util.UUID;

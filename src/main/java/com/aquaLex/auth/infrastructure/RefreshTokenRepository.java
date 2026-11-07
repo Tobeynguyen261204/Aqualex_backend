@@ -1,11 +1,11 @@
-package com.aquaLex.contract.infrastructure;
+package com.aquaLex.auth.infrastructure;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.aquaLex.contract.domain.RefreshToken;
+import com.aquaLex.auth.domain.RefreshToken;
 
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, UUID> {
     Optional<RefreshToken> findByTokenHash(String tokenHash);

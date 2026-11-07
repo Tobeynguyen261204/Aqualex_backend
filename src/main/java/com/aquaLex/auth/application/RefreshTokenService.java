@@ -1,12 +1,12 @@
-package com.aquaLex.contract.application;
+package com.aquaLex.auth.application;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-import com.aquaLex.contract.domain.RefreshToken;
-import com.aquaLex.contract.domain.User;
-import com.aquaLex.contract.infrastructure.RefreshTokenRepository;
+import com.aquaLex.auth.domain.RefreshToken;
+import com.aquaLex.auth.domain.User;
+import com.aquaLex.auth.infrastructure.RefreshTokenRepository;
 
 import jakarta.transaction.Transactional;
 

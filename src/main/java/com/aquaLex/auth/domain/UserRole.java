@@ -1,4 +1,4 @@
-package com.aquaLex.contract.domain;
+package com.aquaLex.auth.domain;
 
 public enum UserRole {
     ADMIN,

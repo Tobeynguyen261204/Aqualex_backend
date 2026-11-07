@@ -1,4 +1,7 @@
 package com.aquaLex.contract.domain;
+
+import com.aquaLex.auth.domain.User;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;

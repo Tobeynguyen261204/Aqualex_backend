@@ -1,4 +1,4 @@
-package com.aquaLex.contract.controller;
+package com.aquaLex.auth.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aquaLex.common.response.ApiResponse;
-import com.aquaLex.contract.application.AuthService;
-import com.aquaLex.contract.dto.AuthResponse;
-import com.aquaLex.contract.dto.LoginRequest;
-import com.aquaLex.contract.dto.RegisterRequest;
-import com.aquaLex.contract.dto.UserResponse;
+import com.aquaLex.auth.application.AuthService;
+import com.aquaLex.auth.dto.AuthResponse;
+import com.aquaLex.auth.dto.LoginRequest;
+import com.aquaLex.auth.dto.RegisterRequest;
+import com.aquaLex.auth.dto.UserResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;

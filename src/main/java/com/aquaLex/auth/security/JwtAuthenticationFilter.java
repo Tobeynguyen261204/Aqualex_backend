@@ -1,11 +1,11 @@
-package com.aquaLex.contract.security;
+package com.aquaLex.auth.security;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.aquaLex.contract.application.TokenBlacklistService;
-import com.aquaLex.contract.domain.User;
-import com.aquaLex.contract.infrastructure.UserRepository;
+import com.aquaLex.auth.application.TokenBlacklistService;
+import com.aquaLex.auth.domain.User;
+import com.aquaLex.auth.infrastructure.UserRepository;
 
 import io.jsonwebtoken.JwtException;
 

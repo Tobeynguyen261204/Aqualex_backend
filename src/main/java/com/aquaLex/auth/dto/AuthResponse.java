@@ -1,4 +1,4 @@
-package com.aquaLex.contract.dto;
+package com.aquaLex.auth.dto;
 
 public record AuthResponse(
     String accessToken,

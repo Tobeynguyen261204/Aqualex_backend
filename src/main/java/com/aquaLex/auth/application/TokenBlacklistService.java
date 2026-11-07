@@ -1,4 +1,4 @@
-package com.aquaLex.contract.application;
+package com.aquaLex.auth.application;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 

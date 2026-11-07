@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.aquaLex.common.security.CustomAccessDeniedHandler;
 import com.aquaLex.common.security.CustomAuthenticationEntryPoint;
-import com.aquaLex.contract.security.JwtAuthenticationFilter;
+import com.aquaLex.auth.security.JwtAuthenticationFilter;
 
 @Configuration
 public class SecurityConfig {
@@ -68,7 +68,9 @@ public class SecurityConfig {
                             "/api/v1/auth/profile",
                             "/api/v1/auth/logout",
                             "/api/v1/contracts",
-                            "/api/v1/contracts/**"
+                            "/api/v1/contracts/**",
+                            "/api/v1/ai-contracts",
+                            "/api/v1/ai-contracts/**"
                     ).authenticated()
                         .anyRequest().authenticated()
 )

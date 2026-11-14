@@ -20,6 +20,7 @@ import com.aquaLex.ai.contract.dto.UpdateDraftRequest;
 import com.aquaLex.ai.contract.infrastructure.GenerationRequestRepository;
 import com.aquaLex.auth.domain.User;
 import com.aquaLex.auth.infrastructure.UserRepository;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class GenerationRequestService {
@@ -31,6 +32,7 @@ public class GenerationRequestService {
     private final ContractDraftGenerator contractDraftGenerator;
     private final ContractReviewService contractReviewService;
     private final ContractRevisionService contractRevisionService;
+    private final PdfTextExtractionService pdfTextExtractionService;
 
     public GenerationRequestService(
             GenerationRequestRepository generationRequestRepository,
@@ -39,7 +41,8 @@ public class GenerationRequestService {
             ObjectMapper objectMapper,
             ContractDraftGenerator contractDraftGenerator,
             ContractReviewService contractReviewService,
-            ContractRevisionService contractRevisionService
+            ContractRevisionService contractRevisionService,
+            PdfTextExtractionService pdfTextExtractionService
     ) {
         this.generationRequestRepository = generationRequestRepository;
         this.userRepository = userRepository;
@@ -48,6 +51,7 @@ public class GenerationRequestService {
         this.contractDraftGenerator = contractDraftGenerator;
         this.contractReviewService = contractReviewService;
         this.contractRevisionService = contractRevisionService;
+        this.pdfTextExtractionService = pdfTextExtractionService;
     }
 
     public GenerationRequestResponse createRequest(
@@ -94,7 +98,9 @@ public class GenerationRequestService {
         }
 
         ContractAnalysisResult analysisResult =
-                contractAnalysisService.analyze(generationRequest.getDescription());
+                contractAnalysisService.analyze(
+                        buildAnalysisInput(generationRequest)
+                );
 
         generationRequest.updateAnalysisResult(
                 analysisResult.extractedData(),
@@ -102,6 +108,35 @@ public class GenerationRequestService {
                 analysisResult.warnings(),
                 analysisResult.status()
         );
+        generationRequestRepository.save(generationRequest);
+
+        return toResponse(generationRequest);
+    }
+
+    public GenerationRequestResponse attachPdf(
+            UUID requestId,
+            String userEmail,
+            MultipartFile file
+    ) {
+        GenerationRequest generationRequest =
+                generationRequestRepository.findByIdAndUser_Email(
+                        requestId,
+                        userEmail
+                ).orElseThrow(() -> new GenerationRequestNotFoundException(
+                        "Generation request not found"
+                ));
+
+        if (generationRequest.getStatus() != GenerationRequestStatus.ANALYZING
+                && generationRequest.getStatus()
+                        != GenerationRequestStatus.NEEDS_CONFIRMATION) {
+            throw new IllegalStateException(
+                    "A PDF can only be attached before draft generation"
+            );
+        }
+
+        String fileName = file.getOriginalFilename();
+        String extractedText = pdfTextExtractionService.extractText(file);
+        generationRequest.attachSourceDocument(fileName, extractedText);
         generationRequestRepository.save(generationRequest);
 
         return toResponse(generationRequest);
@@ -310,6 +345,7 @@ public class GenerationRequestService {
                         exception
                 );
             }
+
         }
 
         if (additionalData != null) {
@@ -324,6 +360,17 @@ public class GenerationRequestService {
                     exception
             );
         }
+    }
+
+    private String buildAnalysisInput(GenerationRequest request) {
+        if (request.getSourceText() == null
+                || request.getSourceText().isBlank()) {
+            return request.getDescription();
+        }
+
+        return request.getDescription()
+                + "\n\nAttached PDF content:\n"
+                + request.getSourceText();
     }
 
     private GenerationRequestResponse toResponse(
@@ -342,7 +389,8 @@ public class GenerationRequestService {
                 generationRequest.getDraftLanguage(),
                 generationRequest.getDraftVersion(),
                 generationRequest.getReviewResult(),
-                generationRequest.getReviewAt()
+                generationRequest.getReviewAt(),
+                generationRequest.getSourceFileName()
         );
     }
 

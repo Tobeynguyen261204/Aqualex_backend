@@ -13,10 +13,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestPart;
 
 import com.aquaLex.common.response.ApiResponse;
 import com.aquaLex.ai.contract.application.ContractPdfExportService;
 import com.aquaLex.ai.contract.application.GenerationRequestService;
+import com.aquaLex.ai.contract.application.PdfTextExtractionService;
 import com.aquaLex.ai.contract.dto.ConfirmGenerationRequest;
 import com.aquaLex.ai.contract.dto.CreateGenerationRequest;
 import com.aquaLex.ai.contract.dto.GenerationRequestResponse;
@@ -28,6 +30,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.util.UUID;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/v1/ai-contracts")
@@ -35,13 +38,16 @@ public class AiContractController {
 
     private final GenerationRequestService generationRequestService;
     private final ContractPdfExportService contractPdfExportService;
+    private final PdfTextExtractionService pdfTextExtractionService;
 
     public AiContractController(
             GenerationRequestService generationRequestService,
-            ContractPdfExportService contractPdfExportService
+            ContractPdfExportService contractPdfExportService,
+            PdfTextExtractionService pdfTextExtractionService
     ) {
         this.generationRequestService = generationRequestService;
         this.contractPdfExportService = contractPdfExportService;
+        this.pdfTextExtractionService = pdfTextExtractionService;
     }
 
     @PostMapping
@@ -89,6 +95,37 @@ public class AiContractController {
         return ApiResponse.success(
                 "GENERATION_REQUEST_ANALYZED",
                 "AI contract generation request analyzed successfully",
+                response,
+                httpRequest.getRequestURI()
+        );
+    }
+
+    @PostMapping(
+            value = "/{requestId}/files",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @ResponseStatus(HttpStatus.OK)
+    @Operation(
+            summary = "Attach a PDF to an AI contract request",
+            description = "Extracts text from a PDF and stores it for AI analysis."
+    )
+    @SecurityRequirement(name = "bearerAuth")
+    public ApiResponse<GenerationRequestResponse> attachPdf(
+            @PathVariable UUID requestId,
+            @RequestPart("file") MultipartFile file,
+            Authentication authentication,
+            HttpServletRequest httpRequest
+    ) {
+        GenerationRequestResponse response =
+                generationRequestService.attachPdf(
+                        requestId,
+                        authentication.getName(),
+                        file
+                );
+
+        return ApiResponse.success(
+                "SOURCE_PDF_ATTACHED",
+                "Source PDF attached and text extracted successfully",
                 response,
                 httpRequest.getRequestURI()
         );

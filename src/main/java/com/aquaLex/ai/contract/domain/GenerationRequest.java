@@ -32,6 +32,12 @@ public class GenerationRequest {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
+    @Column(name = "source_file_name", length = 255)
+    private String sourceFileName;
+
+    @Column(name = "source_text", columnDefinition = "TEXT")
+    private String sourceText;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private GenerationRequestStatus status;
@@ -84,6 +90,14 @@ public class GenerationRequest {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getSourceFileName() {
+        return sourceFileName;
+    }
+
+    public String getSourceText() {
+        return sourceText;
     }
 
     public User getUser() {
@@ -169,5 +183,15 @@ public class GenerationRequest {
         this.reviewResult = reviewResult;
         this.reviewAt = reviewAt;
         this.updatedAt = reviewAt;
+    }
+
+    public void attachSourceDocument(String fileName, String text) {
+        this.sourceFileName = fileName;
+        this.sourceText = text;
+        this.extractedData = null;
+        this.missingFields = null;
+        this.warnings = null;
+        this.status = GenerationRequestStatus.ANALYZING;
+        this.updatedAt = Instant.now();
     }
 }

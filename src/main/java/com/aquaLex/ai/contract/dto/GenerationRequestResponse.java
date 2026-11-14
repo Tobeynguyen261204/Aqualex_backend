@@ -18,6 +18,7 @@ public record GenerationRequestResponse(
         String draftLanguage,
         Integer draftVersion,
         String reviewResult,
-        Instant reviewAt
+        Instant reviewAt,
+        String sourceFileName
 ) {
 }
